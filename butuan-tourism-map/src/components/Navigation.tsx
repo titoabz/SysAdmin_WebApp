@@ -6,22 +6,75 @@ import { supabase } from "@/lib/supabase";
 
 export default function Navigation() {
   const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     const getUser = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      setUser(user);
+
+      if (isMounted) {
+        setUser(user);
+      }
     };
 
-    getUser();
+    const initAuth = async () => {
+      try {
+        await getUser();
+      } catch (error) {
+        console.error("Auth error:", error);
+        if (isMounted) {
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    initAuth();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (isMounted) {
+        setUser(session?.user || null);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
   };
+
+  if (loading) {
+    return (
+      <nav className="bg-green-800 text-white shadow-lg">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <Link href="/" className="text-2xl font-bold">
+            Butuan Tourism Map
+          </Link>
+          <div className="w-20 h-8 bg-green-700 animate-pulse rounded" />
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="bg-green-800 text-white shadow-lg">
