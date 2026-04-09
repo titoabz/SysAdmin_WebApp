@@ -1,0 +1,169 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+
+export default function EditSite() {
+  const router = useRouter();
+  const params = useParams<{ id: string }>();
+
+  const [formData, setFormData] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const fetchSite = async () => {
+      const { data } = await supabase.from("heritage_sites").select("*").eq("id", params.id).single();
+      if (data) setFormData(data);
+      setLoading(false);
+    };
+
+    if (params.id) fetchSite();
+  }, [params.id]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+
+    const { error } = await supabase
+      .from("heritage_sites")
+      .update({
+        name: formData.name,
+        category: formData.category,
+        latitude: parseFloat(formData.latitude),
+        longitude: parseFloat(formData.longitude),
+        short_description: formData.short_description,
+        operating_hours: formData.operating_hours,
+        entrance_fee: formData.entrance_fee,
+        status: formData.status,
+      })
+      .eq("id", params.id);
+
+    if (error) {
+      alert(`Error: ${error.message}`);
+    } else {
+      alert("Updated");
+      router.push("/admin/sites");
+    }
+
+    setSaving(false);
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Delete permanently?")) return;
+    await supabase.from("heritage_sites").delete().eq("id", params.id);
+    router.push("/admin/sites");
+  };
+
+  if (loading) return <div className="text-center py-10">Loading...</div>;
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <nav className="bg-green-800 text-white p-4">
+        <Link href="/admin/sites">Back</Link>
+        <h1 className="text-xl font-bold inline ml-4">Edit: {formData.name}</h1>
+      </nav>
+      <div className="container mx-auto p-6 max-w-3xl">
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow">
+          <div className="mb-4">
+            <label className="block font-semibold">Name</label>
+            <input
+              type="text"
+              value={formData.name || ""}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold">Category</label>
+            <select
+              value={formData.category || ""}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full p-2 border rounded"
+            >
+              <option value="archaeological">Archaeological</option>
+              <option value="religious">Religious</option>
+              <option value="museum">Museum</option>
+              <option value="natural">Natural</option>
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block font-semibold">Latitude</label>
+              <input
+                type="number"
+                step="any"
+                value={formData.latitude || ""}
+                onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div>
+              <label className="block font-semibold">Longitude</label>
+              <input
+                type="number"
+                step="any"
+                value={formData.longitude || ""}
+                onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold">Short Description</label>
+            <textarea
+              value={formData.short_description || ""}
+              onChange={(e) => setFormData({ ...formData, short_description: e.target.value })}
+              rows={3}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block font-semibold">Operating Hours</label>
+              <input
+                type="text"
+                value={formData.operating_hours || ""}
+                onChange={(e) => setFormData({ ...formData, operating_hours: e.target.value })}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block font-semibold">Entrance Fee</label>
+              <input
+                type="text"
+                value={formData.entrance_fee || ""}
+                onChange={(e) => setFormData({ ...formData, entrance_fee: e.target.value })}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+          </div>
+          <div className="mb-6">
+            <label className="block font-semibold">Status</label>
+            <select
+              value={formData.status || "draft"}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              className="w-full p-2 border rounded"
+            >
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+          <div className="flex gap-3">
+            <button type="submit" disabled={saving} className="flex-1 bg-green-700 text-white p-3 rounded">
+              {saving ? "Saving..." : "Save"}
+            </button>
+            <button type="button" onClick={handleDelete} className="bg-red-600 text-white px-6 rounded">
+              Delete
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
