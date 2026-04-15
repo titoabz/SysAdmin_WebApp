@@ -75,7 +75,7 @@ export default function AdminDashboard() {
             <p className="text-3xl font-bold">{stats.itineraries}</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Link href="/admin/sites" className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-bold">Manage Sites</h2>
             <p className="text-gray-600">Add, edit, or delete heritage sites</p>
@@ -83,6 +83,13 @@ export default function AdminDashboard() {
           <Link href="/admin/itineraries" className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-bold">Manage Itineraries</h2>
             <p className="text-gray-600">Create and edit tour packages</p>
+          </Link>
+          <Link href="/admin/reviews" className="bg-white p-6 rounded-lg shadow hover:shadow-md transition">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-2xl">⭐</span>
+              <h2 className="text-xl font-bold">Manage Reviews</h2>
+            </div>
+            <p className="text-gray-600">Approve, reject, or delete user reviews</p>
           </Link>
         </div>
       </div>

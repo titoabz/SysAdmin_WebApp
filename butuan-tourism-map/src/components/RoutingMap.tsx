@@ -202,7 +202,7 @@ export default function RoutingMap() {
             <p class="popup-description">${site.short_description?.substring(0, 80) || ""}</p>
             ${distanceHtml}
             <div class="popup-actions">
-              <a href="/sites/${site.slug}" class="popup-btn popup-btn-details">Details</a>
+              <a href="/sites/${site.slug}" class="popup-btn popup-btn-details"style="color: white;">Details</a>
               <button class="route-btn-${site.id} popup-btn popup-btn-route">Route</button>
             </div>
           </div>

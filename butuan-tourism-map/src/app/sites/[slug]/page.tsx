@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import VisitButton from "@/components/VisitButton";
+import Reviews from "@/components/Reviews";
 
 export default async function SiteDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -52,6 +53,8 @@ export default async function SiteDetailPage({ params }: { params: Promise<{ slu
 
         <VisitButton siteId={site.id} />
       </div>
+
+      <Reviews siteId={site.id} siteName={site.name} />
     </div>
   );
 }
