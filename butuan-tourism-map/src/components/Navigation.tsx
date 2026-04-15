@@ -3,44 +3,15 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navigation() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const getUser = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (isMounted) setUser(user);
-      } catch (error) {
-        console.error("Auth error:", error);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (isMounted) setUser(session?.user || null);
-      }
-    );
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
+  const { user, isAdmin } = useAuth();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    setUser(null);
     setUserMenuOpen(false);
     window.location.href = "/";
   };
@@ -90,8 +61,8 @@ export default function Navigation() {
                 {link.label}
               </Link>
             ))}
-            
-            {!loading && (user ? (
+
+            {user ? (
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -106,6 +77,15 @@ export default function Navigation() {
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
                     <Link href="/profile" onClick={() => setUserMenuOpen(false)} className="block px-4 py-3 text-gray-700 hover:bg-gray-100">My Profile</Link>
                     <Link href="/profile/visits" onClick={() => setUserMenuOpen(false)} className="block px-4 py-3 text-gray-700 hover:bg-gray-100">My Visits</Link>
+                    {isAdmin && (
+                      <>
+                        <div className="border-t border-gray-100"></div>
+                        <Link href="/admin/dashboard" onClick={() => setUserMenuOpen(false)} className="block px-4 py-3 text-green-700 hover:bg-green-50 font-medium flex items-center gap-2">
+                          <span>👑</span> Admin Dashboard
+                        </Link>
+                      </>
+                    )}
+                    <div className="border-t border-gray-100"></div>
                     <button onClick={handleSignOut} className="block w-full text-left px-4 py-3 text-red-600 hover:bg-gray-100">Sign Out</button>
                   </div>
                 )}
@@ -114,19 +94,29 @@ export default function Navigation() {
               <Link href="/auth/login" className="h-10 bg-white text-green-800 px-4 rounded-lg inline-flex items-center justify-center leading-none hover:bg-gray-100 transition">
                 Sign In
               </Link>
-            ))}
+            )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="md:hidden h-10 w-10 inline-flex items-center justify-center hover:bg-green-700 rounded-lg transition"
-            aria-label="Open menu"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+          {/* Mobile Header Actions */}
+          <div className="md:hidden flex items-center gap-2">
+            {!user && (
+              <Link
+                href="/auth/login"
+                className="h-9 bg-white text-green-800 px-3 rounded-lg inline-flex items-center justify-center text-sm font-medium leading-none hover:bg-gray-100 transition"
+              >
+                Sign In
+              </Link>
+            )}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="h-10 w-10 inline-flex items-center justify-center hover:bg-green-700 rounded-lg transition"
+              aria-label="Open menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -193,6 +183,15 @@ export default function Navigation() {
                   >
                     <span>📍</span> My Visits
                   </Link>
+                  {isAdmin && (
+                    <Link
+                      href="/admin/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 text-green-700 hover:bg-green-50 rounded-lg font-medium border-t border-b border-gray-100 my-2"
+                    >
+                      <span>👑</span> Admin Dashboard
+                    </Link>
+                  )}
                   <button
                     onClick={handleSignOut}
                     className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg"

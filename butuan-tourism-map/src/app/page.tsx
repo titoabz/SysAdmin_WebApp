@@ -1,5 +1,5 @@
 import MapWrapper from "@/components/MapWrapper";
-import Link from "next/link";
+import AdminLink from "@/components/AdminLink";
 
 export default function Home() {
   return (
@@ -31,11 +31,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Admin Access - Mobile Friendly */}
+      {/* Admin Link - Only visible to admins */}
       <div className="text-center text-xs text-gray-400 py-4 md:py-6">
-        <Link href="/admin/login" className="hover:text-gray-600 transition px-3 py-2 inline-block">
-          Admin Access
-        </Link>
+        <AdminLink />
       </div>
     </main>
   );
