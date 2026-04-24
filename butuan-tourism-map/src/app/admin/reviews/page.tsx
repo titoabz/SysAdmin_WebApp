@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 interface Review {
   id: number;
@@ -45,7 +46,7 @@ export default function AdminReviews() {
       const { data: userData } = await supabase
         .from("users")
         .select("role")
-        .eq("email", session.user.email)
+        .eq("id", session.user.id)
         .single();
 
       if (userData?.role !== "admin") {
@@ -96,7 +97,7 @@ export default function AdminReviews() {
 
   const handleModerate = async (id: number, status: "approved" | "rejected") => {
     try {
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from("reviews")
         .update({ status, updated_at: new Date().toISOString() })
         .eq("id", id);
@@ -115,7 +116,7 @@ export default function AdminReviews() {
   const handleDelete = async (id: number) => {
     if (!confirm("Delete this review?")) return;
     try {
-      const { error } = await supabase.from("reviews").delete().eq("id", id);
+      const { error } = await supabaseAdmin.from("reviews").delete().eq("id", id);
       if (error) throw error;
       setSuccess("Review deleted!");
       setTimeout(() => setSuccess(""), 2000);

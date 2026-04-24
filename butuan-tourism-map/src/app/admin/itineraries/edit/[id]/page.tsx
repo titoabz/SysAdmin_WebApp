@@ -14,14 +14,35 @@ export default function EditItinerary() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const fetchItinerary = async () => {
+    const checkAuthAndFetchItinerary = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        router.push("/admin/login");
+        return;
+      }
+
+      const { data: userData } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", session.user.id)
+        .single();
+
+      if (userData?.role !== "admin") {
+        await supabase.auth.signOut();
+        router.push("/admin/login");
+        return;
+      }
+
       const { data } = await supabase.from("itineraries").select("*").eq("id", params.id).single();
       if (data) setFormData(data);
       setLoading(false);
     };
 
-    if (params.id) fetchItinerary();
-  }, [params.id]);
+    if (params.id) checkAuthAndFetchItinerary();
+  }, [params.id, router]);
 
   const updateArrayValue = (field: "highlights" | "sites" | "what_to_bring", index: number, value: string) => {
     const next = [...(formData[field] || [])];
