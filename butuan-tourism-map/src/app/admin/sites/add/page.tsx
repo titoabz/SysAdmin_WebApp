@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -18,7 +18,37 @@ export default function AddSite() {
     status: "published",
   });
   const [loading, setLoading] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        router.push("/admin/login");
+        return;
+      }
+
+      const { data: userData } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", session.user.id)
+        .single();
+
+      if (userData?.role !== "admin") {
+        await supabase.auth.signOut();
+        router.push("/admin/login");
+        return;
+      }
+
+      setAuthChecking(false);
+    };
+
+    checkAuth();
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -57,6 +87,8 @@ export default function AddSite() {
 
     setLoading(false);
   };
+
+  if (authChecking) return <div className="text-center py-10">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gray-100">

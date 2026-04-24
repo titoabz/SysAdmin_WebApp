@@ -21,6 +21,18 @@ export default function AdminItineraries() {
         return;
       }
 
+      const { data: userData } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", session.user.id)
+        .single();
+
+      if (userData?.role !== "admin") {
+        await supabase.auth.signOut();
+        router.push("/admin/login");
+        return;
+      }
+
       const { data } = await supabase
         .from("itineraries")
         .select("*")

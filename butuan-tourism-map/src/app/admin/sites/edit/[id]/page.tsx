@@ -14,14 +14,35 @@ export default function EditSite() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const fetchSite = async () => {
+    const checkAuthAndFetchSite = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        router.push("/admin/login");
+        return;
+      }
+
+      const { data: userData } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", session.user.id)
+        .single();
+
+      if (userData?.role !== "admin") {
+        await supabase.auth.signOut();
+        router.push("/admin/login");
+        return;
+      }
+
       const { data } = await supabase.from("heritage_sites").select("*").eq("id", params.id).single();
       if (data) setFormData(data);
       setLoading(false);
     };
 
-    if (params.id) fetchSite();
-  }, [params.id]);
+    if (params.id) checkAuthAndFetchSite();
+  }, [params.id, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

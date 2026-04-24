@@ -24,7 +24,7 @@ export default function AdminDashboard() {
       const { data: userData } = await supabase
         .from("users")
         .select("role")
-        .eq("email", session.user.email)
+        .eq("id", session.user.id)
         .single();
 
       if (userData?.role !== "admin") {
