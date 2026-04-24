@@ -13,4 +13,3 @@ jobs:
         run: |
           curl -X GET "https://${{ secrets.PROJECT_URL }}/auth/v1/health" \
           -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}"
-          
