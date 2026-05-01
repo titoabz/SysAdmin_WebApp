@@ -56,7 +56,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-green-800 text-white p-4">
+      <nav className="bg-green-700 to green-900 text-white p-4">
         <div className="container mx-auto flex justify-between">
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
           <button onClick={handleLogout} className="bg-red-600 px-4 py-2 rounded">

@@ -18,7 +18,7 @@ export default async function SiteDetailPage({ params }: { params: Promise<{ slu
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-2xl font-bold mb-4">Site not found</h1>
         <Link href="/" className="text-green-700 underline">
-          Back to map
+          ← Back to the Map
         </Link>
       </div>
     );
@@ -27,7 +27,7 @@ export default async function SiteDetailPage({ params }: { params: Promise<{ slu
   return (
     <div className="container mx-auto px-4 py-10 max-w-3xl">
       <Link href="/" className="text-green-700 hover:underline">
-        Back to map
+        ← Back to the Map
       </Link>
 
       <div className="bg-white rounded-xl shadow-lg p-6 mt-4">

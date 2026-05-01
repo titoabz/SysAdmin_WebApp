@@ -29,6 +29,7 @@ export default function AddSite() {
     latitude: "",
     longitude: "",
     short_description: "",
+    long_description: "",
     operating_hours: "",
     entrance_fee: "",
     status: "published",
@@ -60,6 +61,7 @@ export default function AddSite() {
       latitude: parseFloat(formData.latitude),
       longitude: parseFloat(formData.longitude),
       short_description: formData.short_description,
+      long_description: formData.long_description,
       operating_hours: formData.operating_hours,
       entrance_fee: formData.entrance_fee,
       status: formData.status,
@@ -90,11 +92,11 @@ export default function AddSite() {
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-green-800 text-white p-4">
-        <div className="container mx-auto">
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-xl font-bold">Add New Heritage Site</h1>
           <Link href="/admin/sites" className="text-white hover:text-green-200">
             ← Back to Sites
           </Link>
-          <h1 className="text-xl font-bold inline ml-4">Add New Heritage Site</h1>
         </div>
       </nav>
 
@@ -139,6 +141,7 @@ export default function AddSite() {
                   <option value="religious">⛪ Religious</option>
                   <option value="museum">🏛️ Museum</option>
                   <option value="natural">🌿 Natural</option>
+                  <option value="educational">🎓 Educational</option>
                 </select>
               </div>
 
@@ -151,6 +154,18 @@ export default function AddSite() {
                   className="w-full p-2 border rounded-lg"
                   rows={3}
                   placeholder="Brief description of the heritage site..."
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-gray-700 mb-1">Long Description</label>
+                <textarea
+                  name="long_description"
+                  value={formData.long_description}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded-lg"
+                  rows={6}
+                  placeholder="Detailed description of the heritage site, including historical significance, architecture, interesting facts..."
                 />
               </div>
 

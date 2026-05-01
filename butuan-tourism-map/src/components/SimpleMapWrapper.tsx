@@ -40,10 +40,27 @@ export default function SimpleMapWrapper() {
           .select("*")
           .eq("status", "published");
 
+        const categoryColors: Record<string, string> = {
+          archaeological: "#f59e0b",
+          religious: "#ef4444",
+          museum: "#3b82f6",
+          natural: "#10b981",
+          educational: "#8b5cf6",
+        };
+
         if (sites) {
           sites.forEach((site: any) => {
+            const color = categoryColors[site.category] || "#166534";
             const popup = `<div style="padding: 8px; min-width: 160px;"><div style="font-weight: bold; color: #166534;">${site.name}</div><div style="font-size: 10px; color: #666;">${site.category}</div><div style="font-size: 11px; margin: 4px 0;">${site.short_description || ""}</div><a href="/sites/${site.slug}" style="display: inline-block; margin-top: 6px; background: #166534; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px;">View</a></div>`;
-            L.marker([site.latitude, site.longitude]).bindPopup(popup).addTo(map);
+
+            const icon = L.divIcon({
+              className: "custom-marker",
+              html: `<div style="background:${color};width:18px;height:18px;border-radius:50%;border:2px solid white;box-shadow:0 0 0 2px rgba(0,0,0,0.08);"></div>`,
+              iconSize: [18, 18],
+              iconAnchor: [9, 9],
+            });
+
+            (L as any).marker([site.latitude, site.longitude], { icon }).bindPopup(popup).addTo(map);
           });
         }
       } catch (err) {
