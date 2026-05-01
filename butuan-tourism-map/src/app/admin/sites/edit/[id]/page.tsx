@@ -2,8 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+
+// Dynamic import for MapPicker
+const MapPicker = dynamic(() => import("@/components/MapPicker"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-8 h-8 border-2 border-green-700 border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="mt-2">Loading map...</p>
+      </div>
+    </div>
+  ),
+});
 
 export default function EditSite() {
   const router = useRouter();
@@ -56,6 +70,7 @@ export default function EditSite() {
         latitude: parseFloat(formData.latitude),
         longitude: parseFloat(formData.longitude),
         short_description: formData.short_description,
+        long_description: formData.long_description,
         operating_hours: formData.operating_hours,
         entrance_fee: formData.entrance_fee,
         status: formData.status,
@@ -83,9 +98,14 @@ export default function EditSite() {
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-green-800 text-white p-4">
-        <Link href="/admin/sites">Back</Link>
-        <h1 className="text-xl font-bold inline ml-4">Edit: {formData.name}</h1>
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-xl font-bold">Edit Heritage Site</h1>
+          <Link href="/admin/sites" className="text-white hover:text-green-200">
+          ← Back to Sites
+          </Link>
+        </div>
       </nav>
+
       <div className="container mx-auto p-6 max-w-3xl">
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow">
           <div className="mb-4">
@@ -109,30 +129,27 @@ export default function EditSite() {
               <option value="religious">Religious</option>
               <option value="museum">Museum</option>
               <option value="natural">Natural</option>
+              <option value="educational">Educational</option>
             </select>
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">🗺️ Click on map to set location</label>
+            <MapPicker
+              onLocationSelect={(lat, lng) => {
+                setFormData({ ...formData, latitude: lat.toString(), longitude: lng.toString() });
+              }}
+              initialLat={formData.latitude ? parseFloat(formData.latitude) : undefined}
+              initialLng={formData.longitude ? parseFloat(formData.longitude) : undefined}
+            />
           </div>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block font-semibold">Latitude</label>
-              <input
-                type="number"
-                step="any"
-                value={formData.latitude || ""}
-                onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                className="w-full p-2 border rounded"
-                required
-              />
+              <label className="block font-semibold mb-1">Latitude</label>
+              <input type="text" name="latitude" value={formData.latitude || ""} readOnly className="w-full p-2 border rounded bg-gray-50" />
             </div>
             <div>
-              <label className="block font-semibold">Longitude</label>
-              <input
-                type="number"
-                step="any"
-                value={formData.longitude || ""}
-                onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                className="w-full p-2 border rounded"
-                required
-              />
+              <label className="block font-semibold mb-1">Longitude</label>
+              <input type="text" name="longitude" value={formData.longitude || ""} readOnly className="w-full p-2 border rounded bg-gray-50" />
             </div>
           </div>
           <div className="mb-4">
@@ -142,6 +159,17 @@ export default function EditSite() {
               onChange={(e) => setFormData({ ...formData, short_description: e.target.value })}
               rows={3}
               className="w-full p-2 border rounded"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block font-semibold">Long Description</label>
+            <textarea
+              value={formData.long_description || ""}
+              onChange={(e) => setFormData({ ...formData, long_description: e.target.value })}
+              rows={6}
+              className="w-full p-2 border rounded"
+              placeholder="Detailed description of the heritage site..."
             />
           </div>
           <div className="grid grid-cols-2 gap-4 mb-4">

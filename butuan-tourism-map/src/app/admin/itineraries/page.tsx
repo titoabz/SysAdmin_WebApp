@@ -56,9 +56,11 @@ export default function AdminItineraries() {
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-green-800 text-white p-4">
-        <div className="container mx-auto flex justify-between">
+        <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold">Manage Itineraries</h1>
-          <Link href="/admin/dashboard">Back</Link>
+          <Link href="/admin/dashboard" className="text-white hover:text-green-200">
+            ← Back to dashboard
+          </Link>
         </div>
       </nav>
       <div className="container mx-auto p-6">

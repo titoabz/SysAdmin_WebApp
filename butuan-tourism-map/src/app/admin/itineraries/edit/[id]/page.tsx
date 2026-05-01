@@ -101,8 +101,12 @@ export default function EditItinerary() {
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-green-800 text-white p-4">
-        <Link href="/admin/itineraries">Back</Link>
-        <h1 className="text-xl font-bold inline ml-4">Edit: {formData.name}</h1>
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-xl font-bold">Edit Itineraries</h1>
+          <Link href="/admin/dashboard" className="text-white hover:text-green-200">
+            ← Back to Itineraries
+          </Link>
+        </div>
       </nav>
       <div className="container mx-auto p-6 max-w-3xl">
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow">
