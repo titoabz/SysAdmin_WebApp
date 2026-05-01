@@ -2,8 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+
+// Dynamic import for MapPicker
+const MapPicker = dynamic(() => import("@/components/MapPicker"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-8 h-8 border-2 border-green-700 border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="mt-2">Loading map...</p>
+      </div>
+    </div>
+  ),
+});
 
 export default function EditSite() {
   const router = useRouter();
@@ -111,28 +125,24 @@ export default function EditSite() {
               <option value="natural">Natural</option>
             </select>
           </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">🗺️ Click on map to set location</label>
+            <MapPicker
+              onLocationSelect={(lat, lng) => {
+                setFormData({ ...formData, latitude: lat.toString(), longitude: lng.toString() });
+              }}
+              initialLat={formData.latitude ? parseFloat(formData.latitude) : undefined}
+              initialLng={formData.longitude ? parseFloat(formData.longitude) : undefined}
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block font-semibold">Latitude</label>
-              <input
-                type="number"
-                step="any"
-                value={formData.latitude || ""}
-                onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                className="w-full p-2 border rounded"
-                required
-              />
+              <label className="block font-semibold mb-1">Latitude</label>
+              <input type="text" name="latitude" value={formData.latitude || ""} readOnly className="w-full p-2 border rounded bg-gray-50" />
             </div>
             <div>
-              <label className="block font-semibold">Longitude</label>
-              <input
-                type="number"
-                step="any"
-                value={formData.longitude || ""}
-                onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                className="w-full p-2 border rounded"
-                required
-              />
+              <label className="block font-semibold mb-1">Longitude</label>
+              <input type="text" name="longitude" value={formData.longitude || ""} readOnly className="w-full p-2 border rounded bg-gray-50" />
             </div>
           </div>
           <div className="mb-4">
