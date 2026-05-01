@@ -131,12 +131,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Admin Link */}
-      <div className="text-center text-xs text-gray-400 py-4">
-        <Link href="/admin/login" className="hover:text-gray-600">
-          Admin Access
-        </Link>
-      </div>
     </main>
   );
 }
